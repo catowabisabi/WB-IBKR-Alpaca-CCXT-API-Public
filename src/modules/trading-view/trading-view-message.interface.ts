@@ -1,0 +1,53 @@
+// src/webhook/interfaces/tradingview-message.interface.ts
+
+export interface TradingViewMessage {
+    策略: string;
+    帳戶: string;
+    股票: string;
+    每注: string;
+    倍數: number;
+    注解: string;
+    週期: string;
+    機器人: string;
+    交易所: string;
+    時間1: string;
+    時間2: string;
+    當前倉位價格: string;
+    交易動作: string;
+    交易合約量: string;
+    交易入場出場價: string;
+    收盤價: string;
+    當前倉位狀態: string;
+    之前倉位狀態: string;
+    之前倉位價格: string;
+    ticker: string;
+    ex: string;
+    close: string;
+    open: string;
+    high: string;
+    low: string;
+    time: string;
+    volume: string;
+    timenow: string;
+    interval: string;
+    position_size: string;
+    action: string;
+    contracts: string;
+    price: string;
+    id: string;
+    market_position: string;
+    market_position_size: string;
+    prev_market_position: string;
+    prev_market_position_size: string;
+    exchange: string;
+    lever: number;
+    td_mode: string;
+    symbol: string;
+    ord_type: string;
+    ord_base: string;
+    amount: string;
+    strategy_method: string;
+    sltp_type: string;
+    aid: string;
+    api_sec: string;
+}
