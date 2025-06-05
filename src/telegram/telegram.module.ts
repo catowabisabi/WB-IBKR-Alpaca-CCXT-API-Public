@@ -13,7 +13,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
         //return new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {
           console.log(process.env.TELEGRAM_BOT_TOKEN)
 
-        return new TelegramBot('6912758733:AAFLxfTd4oYcvsV5tfkQ9_tHiP16yUmTuEY', {
+        return new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, {
           polling: true,
         });
       },
