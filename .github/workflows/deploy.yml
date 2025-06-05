@@ -1,0 +1,71 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+      JWT_KEY: ${{ secrets.JWT_KEY }}
+      MONGODB_CONNECTION_STRING: ${{ secrets.MONGODB_CONNECTION_STRING }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TG_ID_CHO: ${{ secrets.TG_ID_CHO }}
+      TG_ID_CAT: ${{ secrets.TG_ID_CAT }}
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.HOSTINGER_WB_VPS_SSH }}
+       
+
+    - name: Create directory on VPS
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'mkdir -p /home/cato/projects/nestjs/wb-nestjs-server-only'
+
+  
+
+    - name: Copy files to VPS
+      run: |
+        scp -o StrictHostKeyChecking=no -r ${{ github.workspace }} root@93.127.215.144:/home/cato/projects/nestjs/wb-nestjs-server-only
+
+    - name: Generate .env file
+      run: |
+        echo "GOOGLE_OAUTH_CLIENT_ID=$GOOGLE_OAUTH_CLIENT_ID" > .env
+        echo "GOOGLE_OAUTH_CLIENT_SECRET=$GOOGLE_OAUTH_CLIENT_SECRET" >> .env
+        echo "JWT_KEY=$JWT_KEY" >> .env
+        echo "MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING" >> .env
+        echo "TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN" >> .env
+        echo "TG_ID_CHO=$TG_ID_CHO" >> .env
+        echo "TG_ID_CAT=$TG_ID_CAT" >> .env
+        echo "API_BASE_URL=$API_BASE_URL" >> .env
+    
+    - name: Copy .env file to VPS
+      run: |
+        scp -o StrictHostKeyChecking=no .env root@93.127.215.144:/home/cato/projects/nestjs/wb-nestjs-server-only/wb-nestjs-server-only/
+
+    - name: Install dependencies
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only/wb-nestjs-server-only && npm install'
+
+    - name: Build project
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only/wb-nestjs-server-only && npm run build'
+        
+    - name: Stop server
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only/wb-nestjs-server-only && npm run stop:prod'
+
+    - name: Start server
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only/wb-nestjs-server-only && npm run start:prod'

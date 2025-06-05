@@ -1,0 +1,43 @@
+name: Deploy to Hostinger VPS  # 工作流程名稱：部署到 Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main  # 當 main 分支有 push 時觸發部署流程
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # 使用 GitHub 提供的 Ubuntu 虛擬機作為執行環境
+
+    steps:
+    - name: Checkout code  # 第一步：從 GitHub 下載原始碼
+      uses: actions/checkout@v2
+
+    - name: Set up SSH  # 設定 SSH 金鑰，用於後續與 VPS 通訊
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.HOSTINGER_WB_VPS_SSH }}  # 從 GitHub Secrets 取得 SSH 私鑰
+
+    - name: Create directory on VPS  # 在遠端 VPS 上建立部署資料夾
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'mkdir -p /home/cato/projects/nestjs/wb-nestjs-server-only'
+
+    - name: Copy files to VPS  # 將目前專案所有檔案複製到 VPS 指定資料夾
+      run: |
+        scp -o StrictHostKeyChecking=no -r . root@93.127.215.144:/home/cato/projects/nestjs/wb-nestjs-server-only
+
+    - name: Install dependencies  # 在 VPS 上安裝 npm 套件
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only && npm install'
+
+    - name: Build project  # 編譯 NestJS 專案（生產用）
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only && npm run build'
+        
+    - name: Stop server  # 停止當前正在運行的服務（如果有）
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only && npm stop'
+
+    - name: Start server  # 啟動應用程式（例如使用 pm2 或 node）
+      run: |
+        ssh -o StrictHostKeyChecking=no root@93.127.215.144 'cd /home/cato/projects/nestjs/wb-nestjs-server-only && npm start'
