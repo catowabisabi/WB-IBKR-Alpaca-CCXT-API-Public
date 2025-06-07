@@ -13,7 +13,7 @@ export class ExchangesService2 {
   private initializeExchanges() {
     const exchangeList: { id: string, class: any }[] = [
         { id: 'binance', class: ccxt.binance },
-        { id: 'coinbasepro', class: ccxt.coinbasepro },
+        { id: 'coinbase', class: ccxt.coinbase },
         { id: 'bitget', class: ccxt.bitget },
         { id: 'bybit', class: ccxt.bybit },
         { id: 'kucoin', class: ccxt.kucoin },
