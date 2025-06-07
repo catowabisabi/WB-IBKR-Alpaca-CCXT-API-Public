@@ -44,7 +44,7 @@ export class ExchangesService {
   private initializeExchanges() {
     const exchangeList: { id: string, class: any }[] = [
         { id: 'binance', class: ccxt.binance },
-        { id: 'coinbasepro', class: ccxt.coinbasepro },
+        //{ id: 'coinbasepro', class: ccxt.coinbasepro },
         { id: 'bitget', class: ccxt.bitget },
         { id: 'bybit', class: ccxt.bybit },
         { id: 'kucoin', class: ccxt.kucoin },
